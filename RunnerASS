@@ -154,6 +154,7 @@ public class RunnerASS extends Application {
             setUpAltitudeLabels();
 
 
+            /*
             // testing
             Image image = new Image(new FileInputStream("C:\\Users\\Shady\\Desktop\\EastAngelsCropped.gif"));
 
@@ -171,7 +172,8 @@ public class RunnerASS extends Application {
             //Setting the preserve ratio of the image view
             imageView.setPreserveRatio(true);
 
-getChildren().addAll(imageView);
+            getChildren().addAll(imageView);
+            */
 
 
             firstTime = false;
