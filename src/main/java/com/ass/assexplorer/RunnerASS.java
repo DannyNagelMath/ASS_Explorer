@@ -1,0 +1,481 @@
+package com.ass.assexplorer;
+
+import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+public class RunnerASS extends Application {
+
+    private final double HEIGHT = 600;
+    private final double WIDTH = 800;
+
+    // primaryStage.  Used by Draw Button to reset the interact window.
+    private Stage stage;
+
+    private Pane root;
+
+    // All the menus buttons.  Most input is processed here first.
+    // Currently internal to this class
+    private ASSMenu menu;
+
+    // ASSInteract is the main interactive graphics object
+    private ASSInteract interact;
+
+    // SideLen and Angle labels.
+    // Also to be used in Solve Stage. Partially done.
+    private ASSLabels ASSLabels;
+
+    // ASS inputs
+    private double angle, sideLen, swingLen;
+
+    // For the Labels and Altitude toggle buttons
+    private boolean onAltitude, onLabels;
+
+    // Used when redrawing interact
+    private boolean firstTime = true;
+    private int choiceBoxAngleInt, choiceBoxSideInt, choiceBoxSwingInt;
+
+    // root (Pane) contains an ASSMenu (VBox),
+    // an ASSInteract (Pane) translated to the right by ASSMenu's width,
+    // and a bunch of Labels.
+    public Parent setUpRoot(double angle, double sideLen, double swingLen) throws FileNotFoundException {
+        root = new Pane();
+        root.setPrefSize(WIDTH, HEIGHT);
+
+        this.angle = angle;
+        this.sideLen = sideLen;
+        this.swingLen = swingLen;
+
+        onAltitude = true;
+        onLabels = true;
+
+        menu = new ASSMenu();
+
+        interact = new ASSInteract(angle, sideLen, swingLen);
+        interact.setTranslateX(WIDTH - HEIGHT);
+
+        // menu must be on top
+        // .addAll(menu, interact) seems to disable interaction with menu...?
+        root.getChildren().addAll(interact, menu);
+
+        //Adds all Labels to root
+        setUpLabels();
+
+        return root;
+    }
+
+    // Initializes and adds Labels to root.
+    private void setUpLabels() {
+        ASSLabels = new ASSLabels(interact, choiceBoxAngleInt, choiceBoxSideInt, choiceBoxSwingInt);
+        for (Label label : ASSLabels.getLabels()) {
+            root.getChildren().add(label);
+            label.setOpacity(1);
+        }
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        stage = primaryStage;
+        primaryStage.setScene(new Scene(setUpRoot(55, 100, 90)));
+        primaryStage.setTitle("Angle Side Side");
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+
+
+    //***************************** ASSMenu Class ****************************
+
+
+    // Menu on the left side of the App.
+    // All buttons are managed here.
+    private class ASSMenu extends VBox {
+
+        //TextFields, ChoiceBox, Text used for ASS inputs
+        private TextField textFieldAngle, textFieldSideLen, textFieldSwingLen;
+
+        private ChoiceBox<String> choiceBoxAngle;
+        private ChoiceBox<String> choiceBoxSide;
+        private ChoiceBox<String> choiceBoxSwing;
+        private Text textSwingLen, textSideLen, textAngle;
+
+        private Button solve, draw;
+        private ToggleButton toggleButtonAltitude, toggleButtonLabels;
+        private HBox hBoxAngle, hBoxSide, hBoxSwing, hBoxDrawSolve, hBoxToggleButtons;
+
+        // Sets up the VBox.
+        ASSMenu() throws FileNotFoundException {
+            setPrefSize(WIDTH - HEIGHT, HEIGHT);
+            setPadding(new Insets(20, 0, 20, 15));
+            setSpacing(5);
+
+            //background
+            BackgroundFill background_fill = new BackgroundFill(Color.WHITESMOKE,
+                    CornerRadii.EMPTY, Insets.EMPTY);
+            Background background = new Background(background_fill);
+            setBackground(background);
+
+            // Initializes choiceBoxAngle, textAngle, textFieldAngle, hBoxAngle
+            // and adds them to to the VBox
+            setUpAngle();
+            buffer(5);
+
+            // Same for choiceBoxSide, textSide, textFieldSide, hBoxSide
+            setUpSide();
+            buffer(5);
+
+            // Same for choiceBoxSwing, textSwing, textFieldSwing, hBoxSwing
+            setUpSwing();
+            buffer(25);
+
+            // Initializes draw, solve, hBoxDrawSolve and adds them to the VBox
+            setUpDrawSolve();
+            buffer(10);
+
+            // Initializes toggleButtonAltitude, toggleButtonLabels, hBoxToggleButtons
+            setUpAltitudeLabels();
+
+
+            /*
+            // testing
+            Image image = new Image(new FileInputStream("C:\\Users\\Shady\\Desktop\\EastAngelsCropped.gif"));
+
+            //Setting the image view
+            ImageView imageView = new ImageView(image);
+
+            //Setting the position of the image
+            imageView.setTranslateX(18);
+            imageView.setTranslateY(60);
+
+            //setting the fit height and width of the image view
+            //imageView.setFitHeight(455);
+            //imageView.setFitWidth(500);
+
+            //Setting the preserve ratio of the image view
+            imageView.setPreserveRatio(true);
+
+            getChildren().addAll(imageView);
+            */
+
+
+            firstTime = false;
+        }
+
+        private void setUpAngle() {
+            textAngle = new Text("Angle");
+            textAngle.setFont(new Font(22));
+            textAngle.setFill(Color.FIREBRICK);
+
+            choiceBoxAngle = new ChoiceBox(FXCollections.observableArrayList("A =", "B =", "C ="));
+
+    // testing
+    choiceBoxAngle.setStyle("-fx-font-size:14");
+
+            // Set up initial text
+            if (firstTime)
+                choiceBoxAngle.setValue("A =");
+            else
+                choiceBoxAngle.setValue(choiceBoxAngle.getItems().get(choiceBoxAngleInt));
+
+            choiceBoxAngle.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    // Set choiceBoxSwing to match appropriate value.
+                    choiceBoxSwing.setValue(choiceBoxSwing.getItems().get(newValue.intValue()));
+
+                    // Update the Label on interact
+                    ASSLabels.changeLabel(ASSLabels.getSwingAngleLabel(), newValue.intValue());
+
+                    ASSLabels.changeLabel(ASSLabels.getBaseAngleLabel(), findBaseAngleLabelInt());
+
+                    choiceBoxAngleInt = choiceBoxAngle.getSelectionModel().getSelectedIndex();
+                }
+            });
+
+            choiceBoxAngleInt = choiceBoxAngle.getSelectionModel().getSelectedIndex();
+
+            textFieldAngle = new TextField(String.valueOf(angle));
+            textFieldAngle.setPromptText("angle");
+            textFieldAngle.setMaxWidth(60);
+
+    // testing
+    textFieldAngle.setStyle("-fx-font-size:14");
+
+            hBoxAngle = new HBox();
+            hBoxAngle.setSpacing(10);
+            hBoxAngle.getChildren().addAll(choiceBoxAngle, textFieldAngle);
+
+            // testing
+            textAngle.setTranslateX(19);
+            hBoxAngle.setTranslateX(19);
+
+            getChildren().addAll(textAngle, hBoxAngle);
+        }
+
+        private void setUpSide() {
+            textSideLen = new Text("Adjacent Side");
+            textSideLen.setFont(new Font(22));
+            textSideLen.setFill(Color.DARKSLATEBLUE);
+
+            choiceBoxSide = new ChoiceBox(FXCollections.observableArrayList("a =", "b =", "c ="));
+
+            // testing
+            choiceBoxSide.setStyle("-fx-font-size:14");
+
+            // Set up initial text
+            if (firstTime)
+                choiceBoxSide.setValue("b =");
+            else
+                choiceBoxSide.setValue(choiceBoxSide.getItems().get(choiceBoxSideInt));
+
+            choiceBoxSide.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    // Update the Label on interact
+                    ASSLabels.changeLabel(ASSLabels.getSideAngleLabel(), newValue.intValue());
+
+                    ASSLabels.changeLabel(ASSLabels.getBaseAngleLabel(), findBaseAngleLabelInt());
+
+                    choiceBoxSideInt = choiceBoxSide.getSelectionModel().getSelectedIndex();
+                }
+            });
+            choiceBoxSideInt = choiceBoxSide.getSelectionModel().getSelectedIndex();
+
+            textFieldSideLen = new TextField(String.valueOf(sideLen));
+            textFieldSideLen.setPromptText("sideLen");
+            textFieldSideLen.setMaxWidth(60);
+
+            // testing
+            textFieldSideLen.setStyle("-fx-font-size:14");
+
+            hBoxSide = new HBox();
+            hBoxSide.setSpacing(10);
+            hBoxSide.getChildren().addAll(choiceBoxSide, textFieldSideLen);
+
+            // testing
+            textSideLen.setTranslateX(19);
+            hBoxSide.setTranslateX(19);
+
+            getChildren().addAll(textSideLen, hBoxSide);
+        }
+
+        private void setUpSwing() {
+            textSwingLen = new Text("Opposite Side");
+            textSwingLen.setFont(new Font(22));
+            textSwingLen.setFill(Color.FIREBRICK);
+
+            choiceBoxSwing = new ChoiceBox(FXCollections.observableArrayList("a =", "b =", "c ="));
+
+            // testing
+            choiceBoxSwing.setStyle("-fx-font-size:14");
+
+            // Set up initial text
+            if (firstTime)
+                choiceBoxSwing.setValue("a =");
+            else
+                choiceBoxSwing.setValue(choiceBoxSwing.getItems().get(choiceBoxSwingInt));
+
+            choiceBoxSwing.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    // Set choiceBoxSwing to match appropriate value.
+                    choiceBoxAngle.setValue(choiceBoxAngle.getItems().get(newValue.intValue()));
+
+                    // update baseAngleLabel
+                    ASSLabels.changeLabel(ASSLabels.getBaseAngleLabel(), findBaseAngleLabelInt());
+
+                    choiceBoxSwingInt = choiceBoxSwing.getSelectionModel().getSelectedIndex();
+                }
+            });
+            choiceBoxSwingInt = choiceBoxSwing.getSelectionModel().getSelectedIndex();
+
+            textFieldSwingLen = new TextField(String.valueOf(swingLen));
+            textFieldSwingLen.setPromptText("swingLen");
+            textFieldSwingLen.setMaxWidth(60);
+
+            // testing
+            textFieldSwingLen.setStyle("-fx-font-size:14");
+
+            hBoxSwing = new HBox();
+            hBoxSwing.setSpacing(10);
+            hBoxSwing.getChildren().addAll(choiceBoxSwing, textFieldSwingLen);
+
+            // testing
+            textSwingLen.setTranslateX(19);
+            hBoxSwing.setTranslateX(19);
+
+            getChildren().addAll(textSwingLen, hBoxSwing);
+        }
+
+        private void setUpDrawSolve() {
+            draw = new Button("Draw");
+            draw.setStyle("-fx-font-size:20"); // autosizes the entire Button
+            draw.setOnAction(event -> {
+                //get the ASS values from textFields.
+                if (menu.isValidInput()) {
+                    try {
+                        stage.setScene(new Scene(setUpRoot(menu.getAngle(), menu.getSideLen(), menu.getSwingLen())));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            solve = new Button("Solve");
+            solve.setStyle("-fx-font-size:20");
+            solve.setOnAction(event -> {
+                //Opens a new window from SolveStage with the solution.
+                SolveStage solveStage = new SolveStage(interact, choiceBoxAngle, choiceBoxSide, choiceBoxSwing);
+            });
+
+            hBoxDrawSolve = new HBox();
+            hBoxDrawSolve.setSpacing(15);
+            hBoxDrawSolve.setTranslateX(5);
+            hBoxDrawSolve.getChildren().addAll(draw, solve);
+
+            getChildren().addAll(hBoxDrawSolve);
+        }
+
+        private void setUpAltitudeLabels() {
+            toggleButtonAltitude = new ToggleButton("Altitude");
+            toggleButtonAltitude.setSelected(true);
+
+            toggleButtonAltitude.setOnAction(event -> {
+                if (onAltitude) {
+                    interact.hideAltitude();
+                    onAltitude = false;
+                } else {
+                    interact.showAltitude();
+                    onAltitude = true;
+                }
+            });
+
+            toggleButtonLabels = new ToggleButton("Labels");
+            toggleButtonLabels.setSelected(true);
+
+            toggleButtonLabels.setOnAction(event -> {
+                if (onLabels) {
+                    for (Label label : ASSLabels.getLabels())
+                        label.setOpacity(0);
+                    onLabels = false;
+                } else {
+                    for (Label label : ASSLabels.getLabels())
+                        label.setOpacity(1);
+                    onLabels = true;
+                }
+            });
+
+            hBoxToggleButtons = new HBox();
+            hBoxToggleButtons.setSpacing(20);
+            hBoxToggleButtons.setTranslateX(20);
+            hBoxToggleButtons.getChildren().addAll(toggleButtonAltitude, toggleButtonLabels);
+
+            getChildren().addAll(hBoxToggleButtons);
+
+
+
+        }
+
+
+
+
+        // Determine appropriate temp int to pass as second argument of changeLabel()
+        public int findBaseAngleLabelInt() {
+            int sum = choiceBoxSwing.getSelectionModel().selectedIndexProperty().getValue() +
+                    choiceBoxSide.getSelectionModel().selectedIndexProperty().getValue();
+            switch (sum) {
+                case 1:
+                    return 2;
+                case 2:
+                    return 1;
+                case 3:
+                    return 0;
+                default:
+                    return sum / 2;
+            }
+        }
+
+        // Adds to VBox a buffer of size fontSize.  What's the good way to do this?
+        private void buffer(double fontSize) {
+            Text buffer = new Text(" ");
+            buffer.setFont(new Font(fontSize));
+
+            getChildren().addAll(buffer);
+        }
+
+        // Check to make sure the input is a double.
+        // From NewBoston Gui Tutorial Ep 9,10
+        private boolean isDouble(TextField input) {
+            try {
+                double text = Double.parseDouble(input.getText());
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        // Checks if all three inputs are doubles in their appropriate ranges
+        public boolean isValidInput() {
+            return getAngle() > -1 && getSideLen() > -1 && getSwingLen() > -1;
+        }
+
+        // Checks if angle input is double in correct range and if so returns it.
+        // Returns -1.0 if Angle text is not a double in [0,180).
+        public double getAngle() {
+            if (!isDouble(textFieldAngle))
+                return -1;
+
+            double tempAngle = Double.parseDouble(textFieldAngle.getText());
+            if (tempAngle <= 0 || tempAngle >= 180)
+                return -1;
+
+            return tempAngle;
+        }
+
+        // Checks if sideLen input is double in correct range and if so returns it.
+        // Returns -1.0 if sideLen is not a double > 0.
+        public double getSideLen() {
+            if (!isDouble(textFieldSideLen)) {
+                return -1;
+            }
+
+            double tempSideLen = Double.parseDouble(textFieldSideLen.getText());
+            if (tempSideLen <= 0)
+                return -1;
+            else
+                return tempSideLen;
+        }
+
+        // Checks if swingLen input is double in correct range and if so returns it.
+        // Returns -1.0 if swingLen is not a double > 0.
+        public double getSwingLen() {
+            if (!isDouble(textFieldSwingLen)) {
+                return -1;
+            }
+
+            double tempSwingLen = Double.parseDouble(textFieldSwingLen.getText());
+            if (tempSwingLen <= 0)
+                return -1;
+            else
+                return tempSwingLen;
+        }
+    }
+}
