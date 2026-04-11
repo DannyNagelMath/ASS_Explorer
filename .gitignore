@@ -23,7 +23,11 @@
 hs_err_pid*
 replay_pid*
 
-git add .
-git commit -m "Initial commit - proper Maven project structure"
-git remote add origin https://github.com/DannyNagelMath/ASS_Explorer.git
-git push --force origin master
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Maven target folder
+target/
