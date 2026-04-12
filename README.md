@@ -15,7 +15,7 @@ Download the installer from the [Releases](https://github.com/DannyNagelMath/ASS
 
 ## Features
 
-- Enter any **angle**, **adjacent side**, and **opposite side** via the input panel to instantly render the triangle
+- Enter any **angle**, **adjacent side**, and **opposite side** via the input panel and press **Draw** to instantly render the triangle
 - **Ambiguous case handling** — automatically determines 0, 1, or 2 triangle solutions using the Law of Sines, including right-triangle and altitude edge cases
 - **Interactive swing arm** — drag the endpoint of the opposite side around its pivot to explore both solutions visually; solutions snap into place when the drag reaches them
 - **Solve window** — opens a dedicated solution stage displaying a written diagnosis, all computed angles and side lengths, and a labeled triangle drawing for each solution
