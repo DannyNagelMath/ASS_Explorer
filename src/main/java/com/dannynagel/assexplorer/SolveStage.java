@@ -1,4 +1,4 @@
-package com.ass.assexplorer;
+package com.dannynagel.assexplorer;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;

@@ -1,8 +1,8 @@
-module com.ass.assexplorer {
+module com.dannynagel.assexplorer {
     requires javafx.controls;
     requires javafx.fxml;
 
 
-    opens com.ass.assexplorer to javafx.fxml;
-    exports com.ass.assexplorer;
+    opens com.dannynagel.assexplorer to javafx.fxml;
+    exports com.dannynagel.assexplorer;
 }

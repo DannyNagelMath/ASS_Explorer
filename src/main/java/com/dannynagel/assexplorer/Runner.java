@@ -1,4 +1,4 @@
-package com.ass.assexplorer;
+package com.dannynagel.assexplorer;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -8,18 +8,15 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class RunnerASS extends Application {
+public class Runner extends Application {
 
     private final double HEIGHT = 600;
     private final double WIDTH = 800;

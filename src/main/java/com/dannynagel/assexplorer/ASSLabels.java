@@ -1,4 +1,4 @@
-package com.ass.assexplorer;
+package com.dannynagel.assexplorer;
 
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;

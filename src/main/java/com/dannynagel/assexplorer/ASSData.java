@@ -1,4 +1,4 @@
-package com.ass.assexplorer;
+package com.dannynagel.assexplorer;
 
 // Stores data (numSolutions, sides, angles, altitude, etc) for ASS
 // All data is UNSCALED!!!

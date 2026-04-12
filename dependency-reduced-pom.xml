@@ -46,7 +46,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.ass.assexplorer.RunnerASS</mainClass>
+                  <mainClass>com.dannynagel.assexplorer.Runner</mainClass>
                 </transformer>
               </transformers>
             </configuration>
