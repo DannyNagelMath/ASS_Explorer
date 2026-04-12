@@ -1,10 +1,13 @@
 # ASS_Explorer
 
 A fully featured Angle-Side-Side triangle explorer built with **Java** and **JavaFX**.
-
-![screenshot](docs/readme_screenshot_1.png)
-![screenshot](docs/readme_screenshot_2.png)
-![screenshot](docs/readme_screenshot_3.png)
+<table>
+  <tr>
+    <td><img src="docs/readme_screenshot_1.png" width="260"/></td>
+    <td><img src="docs/readme_screenshot_2.png" width="260"/></td>
+    <td><img src="docs/readme_screenshot_3.png" width="260"/></td>
+  </tr>
+</table>
 
 ## Installation
 
