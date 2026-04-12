@@ -3,6 +3,8 @@
 A fully featured Angle-Side-Side triangle explorer built with **Java** and **JavaFX**.
 
 ![screenshot](docs/readme_screenshot_1.png)
+![screenshot](docs/readme_screenshot_2.png)
+![screenshot](docs/readme_screenshot_3.png)
 
 ## Installation
 
